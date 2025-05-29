@@ -1,1 +1,72 @@
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #282c34;
+  color: #eee;
+  text-align: center;
+  margin: 0;
+  padding: 20px;
+  user-select: none;
+}
 
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: fit-content;
+  margin: auto;
+  max-width: fit-content;
+}
+
+h1 {
+  color: #a0d2eb;
+  margin-bottom: 20px;
+  letter-spacing: 1.2px;
+  text-shadow: 0 0 4px #a0d2eb44;
+}
+
+.game-area {
+  display: flex;
+  align-items: flex-start;
+  gap: 40px;
+}
+
+.maze {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(17, 32px);
+  grid-template-rows: repeat(17, 32px);
+  gap: 0;
+  background: #111;
+  border-radius: 8px;
+  box-shadow: 0 0 15px #a0d2eb;
+  padding: 0;
+}
+
+.cell {
+  width: 32px;
+  height: 32px;
+  background-color: #fff;
+  box-sizing: border-box;
+  transition: background-color 0.3s ease;
+}
+
+.player {
+  width: 20px;
+  height: 20px;
+  background-color: #eab252;
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform: translate(6px, 6px);
+  transition: transform 0.2s ease;
+  border-radius: 4px;
+  box-shadow: 0 0 10px #eab252;
+  z-index: 10;
+}
+
+
+.goal {
+  background-color: #c46169;
+  box-shadow: 0 0 10px #c46169;
+  border-radius: 4px;
+}
