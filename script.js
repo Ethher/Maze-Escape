@@ -107,3 +107,124 @@ function showWinningScreen() {
   const url = `win.html?player=${moveCount}&optimal=${optimalMoves !== null ? optimalMoves : '-'}`;
   window.location.href = url;
 }
+
+function bfs(maze, start, goal) {
+  const rows = maze.length;
+  const cols = maze[0].length;
+  const visited = Array.from({ length: rows }, () => Array(cols).fill(false));
+  const parent = Array.from({ length: rows }, () => Array(cols).fill(null));
+
+  const queue = [start];
+  visited[start.y][start.x] = true;
+
+  const directions = [
+    { dx: 0, dy: -1, dir: 'top', opp: 'bottom' },
+    { dx: 1, dy: 0, dir: 'right', opp: 'left' },
+    { dx: 0, dy: 1, dir: 'bottom', opp: 'top' },
+    { dx: -1, dy: 0, dir: 'left', opp: 'right' },
+  ];
+
+  while (queue.length > 0) {
+    const current = queue.shift();
+
+    if (current.x === goal.x && current.y === goal.y) break;
+
+    for (const { dx, dy, dir, opp } of directions) {
+      const nx = current.x + dx;
+      const ny = current.y + dy;
+
+      if (
+        nx >= 0 && ny >= 0 &&
+        nx < cols && ny < rows &&
+        !visited[ny][nx] &&
+        !maze[current.y][current.x][dir] && !maze[ny][nx][opp]
+      ) {
+        visited[ny][nx] = true;
+        parent[ny][nx] = current;
+        queue.push({ x: nx, y: ny });
+      }
+    }
+  }
+
+  const path = [];
+  let curr = goal;
+  while (curr && !(curr.x === start.x && curr.y === start.y)) {
+    path.unshift(curr);
+    curr = parent[curr.y][curr.x];
+  }
+  if (curr) path.unshift(start);
+
+  return path;
+}
+
+function generateMaze(rows, cols) {
+  const maze = Array.from({ length: rows }, () =>
+    Array.from({ length: cols }, () => ({
+      top: true,
+      right: true,
+      bottom: true,
+      left: true,
+    }))
+  );
+
+  const directions = [
+    { dx: 0, dy: -1, dir: 'top', opp: 'bottom' },
+    { dx: 1, dy: 0, dir: 'right', opp: 'left' },
+    { dx: 0, dy: 1, dir: 'bottom', opp: 'top' },
+    { dx: -1, dy: 0, dir: 'left', opp: 'right' },
+  ];
+
+  function inBounds(x, y) {
+    return x >= 0 && y >= 0 && x < cols && y < rows;
+  }
+
+  function carve(x, y) {
+    maze[y][x].visited = true;
+    const shuffled = directions.sort(() => Math.random() - 0.5);
+    for (const { dx, dy, dir, opp } of shuffled) {
+      const nx = x + dx;
+      const ny = y + dy;
+      if (inBounds(nx, ny) && !maze[ny][nx].visited) {
+        maze[y][x][dir] = false;
+        maze[ny][nx][opp] = false;
+        carve(nx, ny);
+      }
+    }
+  }
+
+  carve(0, 0);
+  return maze;
+}
+
+window.addEventListener('keydown', (e) => {
+  switch (e.key) {
+    case 'ArrowUp':
+    case 'w':
+    case 'W':
+      movePlayer(0, -1);
+      break;
+    case 'ArrowDown':
+    case 's':
+    case 'S':
+      movePlayer(0, 1);
+      break;
+    case 'ArrowLeft':
+    case 'a':
+    case 'A':
+      movePlayer(-1, 0);
+      break;
+    case 'ArrowRight':
+    case 'd':
+    case 'D':
+      movePlayer(1, 0);
+      break;
+    case ' ':
+      e.preventDefault();
+      togglePath();
+      break;
+    default:
+      break;
+  }
+});
+
+initGame();
